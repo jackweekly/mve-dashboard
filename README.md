@@ -54,6 +54,14 @@ This is a Ruby on Rails application for managing and running optimization jobs.
     uvicorn main:app --host 0.0.0.0 --port 8000
     ```
 
+## Cloud deployment
+
+The repository ships with `docker-compose.cloud.yml` and an accompanying
+`.env.cloud.example` so you can boot the full stack (web, Sidekiq, PostgreSQL,
+Redis) on any cloud VM that has Docker installed. See `docs/cloud_deploy.md`
+for a step-by-step guide covering host preparation, environment variables,
+initial migrations, and day-two operations.
+
 ## API Contract
 
 ### Create Job

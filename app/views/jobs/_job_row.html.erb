@@ -1,0 +1,23 @@
+<tr id="<%= dom_id(job) %>">
+  <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
+    <div><%= job.problem_type %></div>
+    <div class="text-xs text-gray-500">Seed: <%= job.seed.presence || "—" %></div>
+  </td>
+  <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500"><%= job.solver %></td>
+  <td class="px-6 py-4">
+    <div class="flex items-center gap-3">
+      <div class="h-2 w-32 overflow-hidden rounded-full bg-gray-200">
+        <div class="h-full rounded-full bg-indigo-500 transition-all" style="width: <%= job.progress %>%"></div>
+      </div>
+      <span class="text-sm text-gray-600"><%= job.progress %>%</span>
+    </div>
+  </td>
+  <td class="whitespace-nowrap px-6 py-4 text-sm">
+    <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold <%= status_badge_class(job) %>">
+      <%= job.status.titleize %>
+    </span>
+  </td>
+  <td class="whitespace-nowrap px-6 py-4 text-right text-sm">
+    <%= link_to "View", job_path(job), class: "font-medium text-indigo-600 hover:text-indigo-500" %>
+  </td>
+</tr>

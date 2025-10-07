@@ -1,2 +1,4 @@
 web: bin/rails server
+worker: bundle exec sidekiq -C config/sidekiq.yml
 css: bin/rails tailwindcss:watch
+redis: ./bin/dev-redis

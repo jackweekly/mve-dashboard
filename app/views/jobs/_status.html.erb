@@ -1,0 +1,23 @@
+<div class="space-y-4">
+  <div class="flex items-center justify-between">
+    <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold <%= status_badge_class(job) %>">
+      <%= job.status.titleize %>
+    </span>
+    <span class="text-sm text-gray-500">Progress: <%= job.progress %>%</span>
+  </div>
+
+  <div class="h-3 w-full overflow-hidden rounded-full bg-gray-200">
+    <div class="h-full rounded-full bg-indigo-500 transition-all" style="width: <%= job.progress %>%"></div>
+  </div>
+
+  <div class="rounded border border-dashed border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
+    <p><strong>Updated:</strong> <%= job.updated_at.strftime("%b %e, %Y %l:%M %p") %></p>
+    <% if job.succeeded? %>
+      <p class="mt-2 text-green-700">Artifacts ready for download will appear here.</p>
+    <% elsif job.failed? %>
+      <p class="mt-2 text-red-700">The run failed. Check worker logs for details.</p>
+    <% else %>
+      <p class="mt-2">Your job is processing. This page will live-update as progress changes.</p>
+    <% end %>
+  </div>
+</div>

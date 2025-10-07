@@ -1,28 +1,79 @@
-<h1 class="text-2xl font-bold mb-4">Job Details</h1>
+<%= link_to "← Back to jobs", jobs_path, class: "text-sm font-medium text-indigo-600 hover:text-indigo-500" %>
 
-<div class="mb-4">
-  <strong>Problem Type:</strong>
-  <%= @job.problem_type %>
+<div class="mt-4 flex items-center justify-between">
+  <div>
+    <h1 class="text-3xl font-bold text-gray-900"><%= @job.problem_type %></h1>
+    <p class="mt-1 text-sm text-gray-500">Queued <%= time_ago_in_words(@job.created_at) %> ago</p>
+  </div>
+  <%= button_to "Duplicate job", duplicate_job_path(@job), method: :post, class: "inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
 </div>
 
-<div class="mb-4">
-  <strong>Solver:</strong>
-  <%= @job.solver %>
-</div>
+<%= turbo_stream_from @job %>
 
-<div class="mb-4">
-  <strong>Seed:</strong>
-  <%= @job.seed %>
-</div>
+<div class="mt-6 grid gap-6 md:grid-cols-3">
+  <div class="col-span-2 space-y-6">
+    <div class="rounded-lg bg-white p-6 shadow">
+      <h2 class="text-lg font-semibold text-gray-900">Status</h2>
+      <div id="<%= dom_id(@job, :status) %>" class="mt-4">
+        <%= render "status", job: @job %>
+      </div>
+    </div>
 
-<div class="mb-4">
-  <strong>Status:</strong>
-  <%= @job.status %>
-</div>
+    <div class="rounded-lg bg-white p-6 shadow">
+      <h2 class="text-lg font-semibold text-gray-900">Parameters</h2>
+      <pre class="mt-4 rounded bg-gray-50 p-4 text-sm text-gray-800"><%= @job.params_pretty %></pre>
+    </div>
+  </div>
 
-<div class="mb-4">
-  <strong>Params:</strong>
-  <pre class="bg-gray-100 p-4 rounded"><%= JSON.pretty_generate(@job.params) %></pre>
-</div>
+  <div class="space-y-6">
+    <div class="rounded-lg bg-white p-6 shadow">
+      <h2 class="text-lg font-semibold text-gray-900">Solver</h2>
+      <dl class="mt-4 space-y-3 text-sm text-gray-600">
+        <div class="flex justify-between">
+          <dt>Solver</dt>
+          <dd class="font-medium text-gray-900"><%= @job.solver %></dd>
+        </div>
+        <div class="flex justify-between">
+          <dt>Seed</dt>
+          <dd class="font-medium text-gray-900"><%= @job.seed.presence || "—" %></dd>
+        </div>
+        <div class="flex justify-between">
+          <dt>External ID</dt>
+          <dd class="font-medium text-gray-900"><%= @job.external_id.presence || "Pending" %></dd>
+        </div>
+      </dl>
+    </div>
 
-<%= button_to "Duplicate Job", duplicate_job_path(@job), method: :post, class: "mt-4 inline-block bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" %>
+    <div class="rounded-lg bg-white p-6 shadow">
+      <h2 class="text-lg font-semibold text-gray-900">Results</h2>
+      <% if @job.result.present? %>
+        <div class="mt-4 space-y-4 text-sm text-gray-700">
+          <% @job.result.metrics&.each do |key, value| %>
+            <div class="flex justify-between">
+              <span class="font-medium text-gray-600"><%= key.to_s.titleize %></span>
+              <span><%= value %></span>
+            </div>
+          <% end %>
+
+          <% artifacts = Array(@job.result.artifacts) %>
+          <% if artifacts.any? %>
+            <div>
+              <p class="font-medium text-gray-600">Artifacts</p>
+              <ul class="mt-2 list-disc space-y-1 pl-5">
+                <% artifacts.each do |artifact| %>
+                  <% label = artifact.is_a?(Hash) ? artifact["name"] || artifact[:name] || "Download" : "Download" %>
+                  <% url = artifact.is_a?(Hash) ? artifact["url"] || artifact[:url] : artifact %>
+                  <li>
+                    <%= link_to label, url, class: "text-indigo-600 hover:text-indigo-500", target: "_blank", rel: "noopener" %>
+                  </li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="mt-3 text-sm text-gray-500">No artifacts yet. They will appear once the job completes.</p>
+      <% end %>
+    </div>
+  </div>
+</div>

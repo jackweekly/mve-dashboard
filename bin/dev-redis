@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PORT="${REDIS_PORT:-6379}"
+
+if nc -z localhost "$PORT" 2>/dev/null; then
+  echo "Redis already running on port $PORT; skipping embedded server." >&2
+  # Keep the process alive so Foreman considers this service healthy.
+  while true; do sleep 60; done
+else
+  exec redis-server --port "$PORT" --save "" --appendonly no
+fi
