@@ -88,4 +88,5 @@ Rails.application.configure do
   config.hosts = host_list
   config.hosts |= ["bupper.nz", "www.bupper.nz"]
   config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+  config.hosts.clear
 end
