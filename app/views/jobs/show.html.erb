@@ -1,0 +1,28 @@
+<h1 class="text-2xl font-bold mb-4">Job Details</h1>
+
+<div class="mb-4">
+  <strong>Problem Type:</strong>
+  <%= @job.problem_type %>
+</div>
+
+<div class="mb-4">
+  <strong>Solver:</strong>
+  <%= @job.solver %>
+</div>
+
+<div class="mb-4">
+  <strong>Seed:</strong>
+  <%= @job.seed %>
+</div>
+
+<div class="mb-4">
+  <strong>Status:</strong>
+  <%= @job.status %>
+</div>
+
+<div class="mb-4">
+  <strong>Params:</strong>
+  <pre class="bg-gray-100 p-4 rounded"><%= JSON.pretty_generate(@job.params) %></pre>
+</div>
+
+<%= button_to "Duplicate Job", duplicate_job_path(@job), method: :post, class: "mt-4 inline-block bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" %>

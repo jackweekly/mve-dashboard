@@ -1,0 +1,27 @@
+<h1 class="text-2xl font-bold mb-4">New Job</h1>
+
+<%= form_with(model: @job, url: jobs_path) do |form| %>
+  <div class="mb-4">
+    <%= form.label :problem_type, class: "block text-gray-700 text-sm font-bold mb-2" %>
+    <%= form.text_field :problem_type, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+  </div>
+
+  <div class="mb-4">
+    <%= form.label :params, "JSON Params", class: "block text-gray-700 text-sm font-bold mb-2" %>
+    <%= form.text_area :params, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+  </div>
+
+  <div class="mb-4">
+    <%= form.label :solver, class: "block text-gray-700 text-sm font-bold mb-2" %>
+    <%= form.text_field :solver, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+  </div>
+
+  <div class="mb-4">
+    <%= form.label :seed, class: "block text-gray-700 text-sm font-bold mb-2" %>
+    <%= form.number_field :seed, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+  </div>
+
+  <div class="flex items-center justify-between">
+    <%= form.submit "Create Job", class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" %>
+  </div>
+<% end %>

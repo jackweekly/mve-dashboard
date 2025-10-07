@@ -1,0 +1,21 @@
+<h1 class="text-2xl font-bold mb-4">Benchmarks</h1>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  <div class="bg-white p-4 rounded-lg shadow-md">
+    <h2 class="text-xl font-bold mb-2">MaxCut</h2>
+    <p class="text-gray-700 mb-4">The Max-Cut problem is the problem of finding a partition of a graph's vertices into two complementary sets, such that the number of edges between the two sets is maximized.</p>
+    <%= button_to "Run MaxCut", "#", method: :post, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+  </div>
+
+  <div class="bg-white p-4 rounded-lg shadow-md">
+    <h2 class="text-xl font-bold mb-2">VRP</h2>
+    <p class="text-gray-700 mb-4">The Vehicle Routing Problem (VRP) is a combinatorial optimization and integer programming problem which asks "What is the optimal set of routes for a fleet of vehicles to traverse in order to deliver to a given set of customers?".</p>
+    <%= button_to "Run VRP", "#", method: :post, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+  </div>
+
+  <div class="bg-white p-4 rounded-lg shadow-md">
+    <h2 class="text-xl font-bold mb-2">Knapsack</h2>
+    <p class="text-gray-700 mb-4">The knapsack problem is a problem in combinatorial optimization: Given a set of items, each with a weight and a value, determine the number of each item to include in a collection so that the total weight is less than or equal to a given limit and the total value is as large as possible.</p>
+    <%= button_to "Run Knapsack", "#", method: :post, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+  </div>
+</div>

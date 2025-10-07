@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  problem_type: MyString
+  params: 
+  solver: MyString
+  seed: 1
+  status: MyString
+
+two:
+  problem_type: MyString
+  params: 
+  solver: MyString
+  seed: 1
+  status: MyString

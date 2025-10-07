@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SparrowOps</title>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  <%= javascript_importmap_tags %>
+</head>
+<body class="bg-gray-100">
+  <nav class="bg-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <a href="/" class="text-2xl font-bold text-gray-800">Sparrow Ops</a>
+          </div>
+          <div class="hidden md:block">
+            <div class="ml-10 flex items-baseline space-x-4">
+              <%= link_to "Dashboard", "#", class: "text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium" %>
+              <%= link_to "Jobs", jobs_path, class: "text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium" %>
+              <%= link_to "Benchmarks", "#", class: "text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium" %>
+              <%= link_to "Settings", "#", class: "text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium" %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      <%= yield %>
+    </div>
+  </main>
+</body>
+</html>
