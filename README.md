@@ -1,66 +1,135 @@
 # Sparrow Ops
 
-This is a Ruby on Rails application for managing and running optimization jobs.
+Sparrow Ops is a Rails 8 application that orchestrates optimization jobs. It
+provides a live dashboard, job submission UI, background processing via
+Sidekiq/Redis, and a stubbed integration point for a Python solver service.
 
-## Prerequisites
+## What’s in the box?
 
-- Ruby
-- Rails
-- PostgreSQL
-- Redis
+- Dashboard summarising queued/running/completed jobs with live updates.
+- Job creation + duplication flow with JSON parameter editing.
+- Sidekiq worker that simulates solver progress and broadcasts status.
+- Seeds that create an admin account and example job/result data.
+- Docker Compose stack for cloud/server deployments.
 
-## Setup
+## Local development
 
-1.  Clone the repository.
-2.  Install the dependencies:
+### Prerequisites
 
-    ```
-    bundle install
-    ```
+| Tool | Version | Notes |
+| --- | --- | --- |
+| Ruby | 3.2.3 | Matches `.ruby-version`; install via `asdf`, `rbenv`, or Homebrew `ruby@3.2`. |
+| Bundler | 2.4.19 | Install with `gem install bundler -v 2.4.19`. |
+| PostgreSQL | 14+ (tested with 16) | Ensure a role/database user exists (defaults below). |
+| Redis | 7+ | Required for Sidekiq and Turbo updates. |
+| Chrome | Latest | Needed for system tests (headless via Selenium). |
 
-3.  Create the database:
+### Bootstrapping
 
-    ```
-    rails db:create
-    ```
+```bash
+git clone https://github.com/<your-org>/mve-dashboard.git
+cd mve-dashboard
 
-4.  Run the migrations:
+bundle _2.4.19_ install
 
-    ```
-    rails db:migrate
-    ```
+# Create databases, run migrations, and seed an example job + admin user
+bin/rails db:setup
 
-5.  Set up the environment variables. Copy the `.env.example` file to `.env` and fill in the values.
+# Optional: customise environment defaults
+export BASIC_AUTH_USERNAME=admin BASIC_AUTH_PASSWORD=password
 
-## Running the application
+# Launch Rails, Sidekiq, Tailwind, and a Redis watcher in one command
+bin/dev
+```
 
-1.  Start the Rails server:
+The app boots on `http://localhost:3000`. Default basic-auth credentials are
+`admin` / `password` (override with env vars). Sidekiq’s web UI is available at
+`/sidekiq` and uses `SIDEKIQ_WEB_USERNAME/SIDEKIQ_WEB_PASSWORD`.
 
-    ```
-    rails server
-    ```
+### Environment variables (development)
 
-2.  Start the Sidekiq workers:
+- `BASIC_AUTH_USERNAME`, `BASIC_AUTH_PASSWORD` – guard the UI.
+- `SIDEKIQ_WEB_USERNAME`, `SIDEKIQ_WEB_PASSWORD` – protect Sidekiq Web.
+- `PY_SERVICE_URL` – URL of the Python solver service (defaults to
+  `http://localhost:8000`; the bundled Ruby stub fakes responses today).
+- `REDIS_URL`, `DATABASE_URL` – override connection strings if needed.
 
-    ```
-    sidekiq
-    ```
+### Running tests
 
-3.  Start the Python service (stub):
+```bash
+bundle _2.4.19_ exec rails test
+```
 
-    ```
-    cd ../python-service
-    pip install -r requirements.txt
-    uvicorn main:app --host 0.0.0.0 --port 8000
-    ```
+The test suite executes controller, model, and system tests. System tests run
+headless Chrome via Selenium; ensure Chrome is installed and accessible.
+
+### Python service stub
+
+Real solver integration lives behind `PythonClient`. The current implementation
+stubs responses so the Rails UX flows end-to-end. When your FastAPI (or other)
+service is ready, point `PY_SERVICE_URL` at it and swap the client
+implementation.
 
 ## Cloud deployment
 
-The repository ships with `docker-compose.cloud.yml` and an accompanying
-`.env.cloud.example` so you can boot the full stack (web, Sidekiq, PostgreSQL,
-Redis) on any cloud VM that has Docker installed. See `docs/cloud_deploy.md`
-for a step-by-step guide covering host preparation, environment variables,
-initial migrations, and day-two operations.
+The repository includes `docker-compose.cloud.yml` and `.env.cloud.example` to
+boot the full stack (web, Sidekiq, PostgreSQL, Redis) on any Docker-capable
+server. `docs/cloud_deploy.md` covers:
+
+1. Preparing an Ubuntu host (Docker, firewall, TLS proxy hints).
+2. Populating `.env.cloud` (master key, DB/Redis URLs, auth credentials).
+3. Building images, running migrations, and starting services.
+4. Rolling updates, backups, and troubleshooting tips.
+
+## API Contract
+
+### Create Job
+
+-   **Endpoint:** `/jobs`
+-   **Method:** `POST`
+-   **Payload:**
+
+    ```json
+    {
+      "problem_type": "<string>",
+      "params": {},
+      "solver": "<string>",
+      "seed": "<integer>"
+    }
+    ```
+
+### Get Job Status
+
+-   **Endpoint:** `/jobs/<job_id>`
+-   **Method:** `GET`
+-   **Response:**
+
+    ```json
+    {
+      "id": "<integer>",
+      "status": "<string>",
+      "progress": "<float>",
+      "logs": "<string>"
+    }
+    ```
+
+### Get Job Results
+
+-   **Endpoint:** `/jobs/<job_id>/results`
+-   **Method:** `GET`
+-   **Response:**
+
+    ```json
+    {
+      "metrics": {},
+      "artifacts": [
+        {
+          "name": "<string>",
+          "url": "<string>"
+        }
+      ]
+    }
+    ```
 
 ## API Contract
 
