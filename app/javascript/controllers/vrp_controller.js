@@ -116,11 +116,15 @@ export default class extends Controller {
     })
 
     this.map.on("style.load", () => {
+      console.log("Mapbox style loaded.")
       this.ensureTerrain()
       if (this.autoReplayTarget?.checked && this.lastRunRoutes) {
         this.renderRoutes(this.lastRunRoutes)
       }
       this.schedule(() => this.map.resize(), 100)
+
+      this.map.on("click", this.handleMapClick.bind(this))
+      this.markers = []
     })
   }
 
@@ -508,6 +512,10 @@ export default class extends Controller {
     this.updateProgress(0)
     this.setStatus("idle")
     this.appendLog("Configuration reset to defaults.", "info")
+
+    // Clear existing markers from the map
+    this.markers.forEach(marker => marker.remove())
+    this.markers = []
   }
 
   pauseReplay() {
@@ -679,5 +687,20 @@ export default class extends Controller {
     const g = (bigint >> 8) & 255
     const b = bigint & 255
     return `rgba(${r}, ${g}, ${b}, ${alpha})`
+  }
+
+  handleMapClick(event) {
+    this.addLocation(event.lngLat)
+  }
+
+  addLocation(lngLat) {
+    const marker = new mapboxgl.Marker()
+      .setLngLat(lngLat)
+      .addTo(this.map)
+    this.markers.push(marker)
+
+    const newLocation = `${lngLat.lat.toFixed(3)}, ${lngLat.lng.toFixed(3)}`
+    const currentLocations = this.locationsInputTarget.value.trim()
+    this.locationsInputTarget.value = currentLocations ? `${currentLocations}\n${newLocation}` : newLocation
   }
 }

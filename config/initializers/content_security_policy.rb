@@ -13,8 +13,8 @@ Rails.application.config.content_security_policy do |p|
 
   p.default_src :none
   p.base_uri    :self
-  p.script_src  :self, :https, 'https://api.mapbox.com'
-  p.style_src   :self, :https, 'https://api.mapbox.com'
+  p.script_src  :self, :https, *mapbox_hosts
+  p.style_src   :self, :https, *mapbox_hosts
   p.img_src     :self, :https, :data, *mapbox_hosts
   p.font_src    :self, :https, :data, 'https://api.mapbox.com'
   p.connect_src :self, :https, *mapbox_hosts

@@ -114,13 +114,16 @@ RAILS_ENV=production bin/rails assets:precompile
 ls public/assets | grep js
 
 # Rebuild Tailwind utilities used by the Mapbox layout
-RAILS_ENV=production bin/rails tailwind:build
+RAILS_ENV=production bin/rails tailwindcss:build
 
 # Ensure the Content Security Policy allows Mapbox hosts and web workers
 grep -R "content_security_policy" config/initializers
 
 # Verify the Mapbox token is present in the deployed environment
 echo $MAPBOX_ACCESS_TOKEN
+
+# In your browser's developer console, check if the Mapbox token is loaded:
+# console.log(mapboxgl.accessToken)
 
 # Restart the service and watch for runtime JavaScript or CSP errors
 sudo systemctl restart mve-dashboard
