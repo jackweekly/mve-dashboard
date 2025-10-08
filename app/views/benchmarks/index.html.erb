@@ -1,21 +1,30 @@
 <h1 class="text-2xl font-bold mb-4">Benchmarks</h1>
 
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
   <div class="bg-white p-4 rounded-lg shadow-md">
-    <h2 class="text-xl font-bold mb-2">MaxCut</h2>
-    <p class="text-gray-700 mb-4">The Max-Cut problem is the problem of finding a partition of a graph's vertices into two complementary sets, such that the number of edges between the two sets is maximized.</p>
-    <%= button_to "Run MaxCut", "#", method: :post, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+    <div class="flex items-center justify-between mb-2">
+      <h2 class="text-xl font-bold">Vehicle Routing Problem</h2>
+      <span class="inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-800">Live</span>
+    </div>
+    <p class="text-gray-700 mb-4">
+      Build, visualize, and iterate on VRP runs. Launch the solver to provide stops, inspect the 3D route, and tune scenarios in real time.
+    </p>
+    <%= link_to "Open VRP Solver", vrp_index_path, class: "inline-flex items-center justify-center rounded bg-blue-600 px-4 py-2 font-semibold text-white shadow-sm transition hover:bg-blue-700" %>
   </div>
 
-  <div class="bg-white p-4 rounded-lg shadow-md">
-    <h2 class="text-xl font-bold mb-2">VRP</h2>
-    <p class="text-gray-700 mb-4">The Vehicle Routing Problem (VRP) is a combinatorial optimization and integer programming problem which asks "What is the optimal set of routes for a fleet of vehicles to traverse in order to deliver to a given set of customers?".</p>
-    <%= button_to "Run VRP", "#", method: :post, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+  <div class="bg-white p-4 rounded-lg shadow-md border border-dashed border-gray-300 text-gray-500">
+    <div class="flex items-center justify-between mb-2">
+      <h2 class="text-xl font-bold">MaxCut</h2>
+      <span class="inline-flex items-center rounded-full bg-gray-200 px-3 py-1 text-xs font-semibold text-gray-600">Coming soon</span>
+    </div>
+    <p class="mb-0">Advanced graph partitioning benchmarks are in progress. Stay tuned for rollout updates.</p>
   </div>
 
-  <div class="bg-white p-4 rounded-lg shadow-md">
-    <h2 class="text-xl font-bold mb-2">Knapsack</h2>
-    <p class="text-gray-700 mb-4">The knapsack problem is a problem in combinatorial optimization: Given a set of items, each with a weight and a value, determine the number of each item to include in a collection so that the total weight is less than or equal to a given limit and the total value is as large as possible.</p>
-    <%= button_to "Run Knapsack", "#", method: :post, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+  <div class="bg-white p-4 rounded-lg shadow-md border border-dashed border-gray-300 text-gray-500">
+    <div class="flex items-center justify-between mb-2">
+      <h2 class="text-xl font-bold">Knapsack</h2>
+      <span class="inline-flex items-center rounded-full bg-gray-200 px-3 py-1 text-xs font-semibold text-gray-600">Coming soon</span>
+    </div>
+    <p class="mb-0">Discrete packing optimization is on the roadmap. Expect early access alongside the next release.</p>
   </div>
 </div>
