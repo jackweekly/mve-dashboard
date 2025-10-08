@@ -1,0 +1,8 @@
+<div data-controller="vrp" data-vrp-access-token-value="<%= ENV['MAPBOX_ACCESS_TOKEN'] %>" style="width: 100%; height: 500px;">
+  <div class="map-overlay">
+    <form data-action="submit->vrp#solve">
+      <textarea data-vrp-target="locationsInput" placeholder="Enter locations (lat,lng per line)"></textarea>
+      <button type="submit">Solve VRP</button>
+    </form>
+  </div>
+</div>

@@ -18,5 +18,9 @@ Rails.application.routes.draw do
 
   get "up" => "rails/health#show", as: :rails_health_check
 
+  resources :vrp, only: [:index] do
+    post :solve, on: :collection
+  end
+
   root "dashboard#index"
 end
