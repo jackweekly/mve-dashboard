@@ -411,8 +411,7 @@ export default class extends Controller {
         const distanceText = entry.distance != null ? `${this.formatNumber(entry.distance, 1)} km` : "—"
         const runtimeText = entry.runtime != null ? `${this.formatNumber(entry.runtime, 1)} s` : "—"
         return `
-          <tr class="hover:bg-slate-900/60">
-            <td class="px-4 py-3">${entry.timestamp.toLocaleTimeString()}</td>
+                      <tr class="hover:bg-slate-900/60 transition ease-in-out duration-150">            <td class="px-4 py-3">${entry.timestamp.toLocaleTimeString()}</td>
             <td class="px-4 py-3 uppercase tracking-wide">${entry.strategy}</td>
             <td class="px-4 py-3">${distanceText}</td>
             <td class="px-4 py-3">${runtimeText}</td>
