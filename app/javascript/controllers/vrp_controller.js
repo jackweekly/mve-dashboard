@@ -120,6 +120,7 @@ export default class extends Controller {
       if (this.autoReplayTarget?.checked && this.lastRunRoutes) {
         this.renderRoutes(this.lastRunRoutes)
       }
+      this.schedule(() => this.map.resize(), 100)
     })
   }
 

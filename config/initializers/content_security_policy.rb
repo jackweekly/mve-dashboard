@@ -5,13 +5,20 @@
 # https://guides.rubyonrails.org/security.html#content-security-policy-header
 
 Rails.application.config.content_security_policy do |p|
+  mapbox_hosts = %w[
+    https://api.mapbox.com
+    https://events.mapbox.com
+    https://*.tiles.mapbox.com
+  ]
+
   p.default_src :none
   p.base_uri    :self
-  p.script_src  :self, :https
-  p.style_src   :self, :https
-  p.img_src     :self, :https, :data
-  p.font_src    :self, :https, :data
-  p.connect_src :self, :https
+  p.script_src  :self, :https, 'https://api.mapbox.com'
+  p.style_src   :self, :https, 'https://api.mapbox.com'
+  p.img_src     :self, :https, :data, *mapbox_hosts
+  p.font_src    :self, :https, :data, 'https://api.mapbox.com'
+  p.connect_src :self, :https, *mapbox_hosts
+  p.worker_src  :self, :blob
   p.frame_ancestors :none
   p.form_action :self
   p.block_all_mixed_content

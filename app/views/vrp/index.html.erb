@@ -1,10 +1,10 @@
 <div
   data-controller="vrp"
   data-vrp-access-token-value="<%= ENV['MAPBOX_ACCESS_TOKEN'] %>"
-  class="grid gap-8 xl:grid-cols-[minmax(0,_70%)_minmax(0,_30%)] text-slate-200"
+  class="flex flex-col gap-8 text-slate-200 lg:grid lg:grid-cols-[minmax(0,_65%)_minmax(320px,_1fr)]"
   style="min-height: calc(100vh - 7rem);"
 >
-  <section class="relative min-h-[60vh] overflow-hidden rounded-[32px] border border-[#2E3440] bg-[#1F2937] shadow-2xl">
+  <section class="relative h-[60vh] overflow-hidden rounded-[32px] border border-[#2E3440] bg-[#1F2937] shadow-2xl lg:h-[calc(100vh-9rem)]">
     <div data-vrp-target="canvas" class="absolute inset-0"></div>
     <div data-vrp-target="launchOverlay" class="pointer-events-none absolute inset-0 hidden items-center justify-center bg-slate-950/70 backdrop-blur-sm">
       <div class="flex flex-col items-center gap-3 text-center">
@@ -50,51 +50,8 @@
     <div class="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#0D1117] to-transparent"></div>
   </section>
 
-  <section class="flex flex-col gap-6">
-    <div class="rounded-[28px] border border-[#2E3440] bg-[#1F2937] p-6 shadow-xl">
-      <h2 class="text-xs uppercase tracking-[0.4em] text-slate-400">Mission Status</h2>
-      <div class="mt-4 grid grid-cols-2 gap-4">
-        <div class="group rounded-2xl border border-slate-700/40 bg-slate-900/40 p-4 shadow-inner transition">
-          <div class="flex items-center justify-between">
-            <p class="text-sm font-semibold text-slate-200">Queued</p>
-            <span class="h-2 w-2 animate-[pulse_2s_infinite] rounded-full bg-slate-400/70"></span>
-          </div>
-          <p data-vrp-target="queuedCount" class="mt-3 text-3xl font-semibold text-slate-100">0</p>
-          <p class="text-xs text-slate-400">Awaiting missions</p>
-        </div>
-        <div class="group rounded-2xl border border-[#00B8D9]/40 bg-[#00B8D9]/10 p-4 shadow-inner transition">
-          <div class="flex items-center justify-between">
-            <p class="text-sm font-semibold text-slate-100">Running</p>
-            <span class="h-2 w-2 animate-ping rounded-full bg-[#00B8D9]"></span>
-          </div>
-          <div class="mt-3 flex items-center gap-3">
-            <p data-vrp-target="runningCount" class="text-3xl font-semibold text-[#00B8D9]">0</p>
-            <div class="h-2 flex-1 rounded-full bg-slate-900/60">
-              <div data-vrp-target="runningProgress" class="h-full w-0 rounded-full bg-[#00B8D9] transition-all"></div>
-            </div>
-          </div>
-          <p class="text-xs text-slate-300">Active missions in flight</p>
-        </div>
-        <div class="group rounded-2xl border border-emerald-400/40 bg-emerald-500/10 p-4 shadow-inner transition">
-          <div class="flex items-center justify-between">
-            <p class="text-sm font-semibold text-slate-100">Succeeded</p>
-            <span class="rounded-full bg-emerald-400/30 px-2 py-0.5 text-[10px] uppercase tracking-wide text-emerald-300">↑</span>
-          </div>
-          <p data-vrp-target="successCount" class="mt-3 text-3xl font-semibold text-emerald-200">0</p>
-          <p data-vrp-target="successDelta" class="text-xs text-emerald-300">Awaiting missions</p>
-        </div>
-        <div class="group rounded-2xl border border-rose-500/40 bg-rose-500/10 p-4 shadow-inner transition">
-          <div class="flex items-center justify-between">
-            <p class="text-sm font-semibold text-rose-100">Failed</p>
-            <span class="rounded-full bg-rose-500/30 px-2 py-0.5 text-[10px] uppercase tracking-wide text-rose-200">!</span>
-          </div>
-          <p data-vrp-target="failedCount" class="mt-3 text-3xl font-semibold text-rose-200">0</p>
-          <p class="text-xs text-rose-200">All clear — no alerts</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="rounded-[28px] border border-[#2E3440] bg-[#1F2937] p-6 shadow-xl">
+  <section class="flex flex-col gap-6 lg:sticky lg:top-24 lg:h-[calc(100vh-9rem)] lg:overflow-y-auto lg:pb-6">
+    <div class="rounded-[24px] border border-[#2E3440] bg-[#1F2937] p-6 shadow-xl">
       <div class="mb-6 flex items-center justify-between">
         <div>
           <h2 class="text-xs uppercase tracking-[0.4em] text-slate-400">Configure Mission</h2>
@@ -112,16 +69,19 @@
           <label class="flex flex-col gap-2 text-sm">
             <span class="text-slate-400">Number of vehicles</span>
             <input type="number" min="1" max="50" step="1" data-vrp-target="vehicleCount" class="rounded-2xl border border-[#2E3440] bg-slate-900 px-4 py-2 text-slate-100 focus:border-[#00B8D9] focus:outline-none" />
+            <span class="text-xs text-slate-500">How many vehicles you’re dispatching on this mission.</span>
           </label>
 
           <label class="flex flex-col gap-2 text-sm">
             <span class="text-slate-400">Vehicle capacity</span>
             <input type="number" min="1" step="1" data-vrp-target="vehicleCapacity" class="rounded-2xl border border-[#2E3440] bg-slate-900 px-4 py-2 text-slate-100 focus:border-[#00B8D9] focus:outline-none" />
+            <span class="text-xs text-slate-500">Maximum load each vehicle can carry.</span>
           </label>
 
           <label class="flex flex-col gap-2 text-sm">
             <span class="text-slate-400">Max route distance (km)</span>
             <input type="number" min="10" step="5" data-vrp-target="maxDistance" class="rounded-2xl border border-[#2E3440] bg-slate-900 px-4 py-2 text-slate-100 focus:border-[#00B8D9] focus:outline-none" />
+            <span class="text-xs text-slate-500">Limits total distance a vehicle can travel this run.</span>
           </label>
 
           <label class="flex flex-col gap-2 text-sm">
@@ -132,6 +92,7 @@
               <option value="quantum">Quantum Hybrid</option>
               <option value="greedy">Greedy Heuristic</option>
             </select>
+            <span class="text-xs text-slate-500">Choose the optimization engine best suited to your scenario.</span>
           </label>
         </div>
 
@@ -142,6 +103,7 @@
             class="h-32 rounded-2xl border border-[#2E3440] bg-slate-900 px-4 py-3 text-slate-100 focus:border-[#6366F1] focus:outline-none"
             placeholder="lat,lng per line. Depot first, followed by stops."
           ></textarea>
+          <span class="text-xs text-slate-500">Paste coordinates or import from CSV (coming soon).</span>
         </label>
 
         <div class="flex items-center justify-between text-xs text-slate-500">
@@ -178,12 +140,56 @@
       </form>
     </div>
 
-    <div class="rounded-[28px] border border-[#2E3440] bg-[#1F2937] p-6 shadow-xl">
-      <div class="mb-4 flex items-center justify-between">
-        <h2 class="text-xs uppercase tracking-[0.4em] text-slate-400">Mission Telemetry</h2>
+    <div class="rounded-[24px] border border-[#2E3440] bg-[#1F2937] p-6 shadow-xl">
+      <div class="flex items-start justify-between gap-6">
+        <div>
+          <h2 class="text-xs uppercase tracking-[0.4em] text-slate-400">Mission Telemetry</h2>
+          <p class="mt-2 text-sm text-slate-400">Live fleet health, progress, and constraints.</p>
+        </div>
         <span data-vrp-target="statusLabel" class="text-xs font-semibold uppercase tracking-wide text-slate-400">Idle</span>
       </div>
-      <div class="space-y-5">
+
+      <div class="mt-6 grid grid-cols-2 gap-4">
+        <div class="rounded-2xl border border-slate-700/40 bg-slate-900/40 p-4 shadow-inner">
+          <div class="flex items-center justify-between">
+            <p class="text-sm font-semibold text-slate-200">Queued</p>
+            <span class="h-2 w-2 animate-[pulse_2s_infinite] rounded-full bg-slate-400/70"></span>
+          </div>
+          <p data-vrp-target="queuedCount" class="mt-3 text-3xl font-semibold text-slate-100">0</p>
+          <p class="text-xs text-slate-400">Awaiting missions</p>
+        </div>
+        <div class="rounded-2xl border border-[#00B8D9]/40 bg-[#00B8D9]/10 p-4 shadow-inner">
+          <div class="flex items-center justify-between">
+            <p class="text-sm font-semibold text-slate-100">Running</p>
+            <span class="h-2 w-2 animate-ping rounded-full bg-[#00B8D9]"></span>
+          </div>
+          <div class="mt-3 flex items-center gap-3">
+            <p data-vrp-target="runningCount" class="text-3xl font-semibold text-[#00B8D9]">0</p>
+            <div class="h-2 flex-1 rounded-full bg-slate-900/60">
+              <div data-vrp-target="runningProgress" class="h-full w-0 rounded-full bg-[#00B8D9] transition-all"></div>
+            </div>
+          </div>
+          <p class="text-xs text-slate-300">Active missions in flight</p>
+        </div>
+        <div class="rounded-2xl border border-emerald-400/40 bg-emerald-500/10 p-4 shadow-inner">
+          <div class="flex items-center justify-between">
+            <p class="text-sm font-semibold text-slate-100">Succeeded</p>
+            <span class="rounded-full bg-emerald-400/30 px-2 py-0.5 text-[10px] uppercase tracking-wide text-emerald-300">↑</span>
+          </div>
+          <p data-vrp-target="successCount" class="mt-3 text-3xl font-semibold text-emerald-200">0</p>
+          <p data-vrp-target="successDelta" class="text-xs text-emerald-300">Awaiting missions</p>
+        </div>
+        <div class="rounded-2xl border border-rose-500/40 bg-rose-500/10 p-4 shadow-inner">
+          <div class="flex items-center justify-between">
+            <p class="text-sm font-semibold text-rose-100">Failed</p>
+            <span class="rounded-full bg-rose-500/30 px-2 py-0.5 text-[10px] uppercase tracking-wide text-rose-200">!</span>
+          </div>
+          <p data-vrp-target="failedCount" class="mt-3 text-3xl font-semibold text-rose-200">0</p>
+          <p class="text-xs text-rose-200">All clear — no alerts</p>
+        </div>
+      </div>
+
+      <div class="mt-6 space-y-5">
         <div>
           <div class="flex items-center justify-between text-xs text-slate-400">
             <span>Progress</span>
@@ -221,7 +227,7 @@
       </div>
     </div>
 
-    <div class="rounded-[28px] border border-[#2E3440] bg-[#1F2937] p-6 shadow-xl">
+    <div class="rounded-[24px] border border-[#2E3440] bg-[#1F2937] p-6 shadow-xl">
       <div class="mb-4 flex items-center justify-between">
         <h2 class="text-xs uppercase tracking-[0.4em] text-slate-400">Run history</h2>
         <div class="flex items-center gap-3 text-xs">
