@@ -8,6 +8,8 @@
   <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
   <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.css">
   <%= javascript_importmap_tags %>
+  <%= turbo_include_tags %>
+  <%= stimulus_include_tags %>
 </head>
 <body class="dark min-h-screen bg-gradient-to-br from-[#0D1117] to-[#1C1F26] text-slate-200">
   <nav class="border-b border-[#2E3440] bg-slate-900/80 backdrop-blur">
