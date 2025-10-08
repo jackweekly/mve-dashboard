@@ -1,1 +1,133 @@
-import { Controller } from \"@hotwired/stimulus\"\nimport mapboxgl from \"mapbox-gl\"\n\n// Connects to data-controller=\"vrp\"\nexport default class extends Controller {\n  static values = {\n    accessToken: String,\n  }\n\n  static targets = [\"locationsInput\"]\n\n  connect() {\n    mapboxgl.accessToken = this.accessTokenValue\n\n    this.map = new mapboxgl.Map({\n      container: this.element,\n      style: \"mapbox://styles/mapbox/streets-v11\",\n      center: [-74.5, 40], // starting position [lng, lat]\n      zoom: 9, // starting zoom\n    })\n  }\n\n  async solve(event) {\n    event.preventDefault()\n\n    const locations = this.locationsInputTarget.value.split(/\n/).map(line => {\n      const [lat, lng] = line.split(\",\").map(coord => parseFloat(coord.trim()))\n      return [lng, lat] // Mapbox expects [lng, lat]\n    }).filter(coord => !isNaN(coord[0]) && !isNaN(coord[1]))\n\n    if (locations.length === 0) {\n      alert(\"Please enter at least one location.\")\n      return\n    }\n\n    try {\n      const response = await fetch(\"/vrp/solve\", {\n        method: \"POST\",\n        headers: {\n          \"Content-Type\": \"application/json\",\n          \"X-CSRF-Token\": document.querySelector(\'meta[name=\"csrf-token\"]\').content\n        },\n        body: JSON.stringify({ vrp: { locations: locations } })\n      })\n\n      const data = await response.json()\n\n      if (data.status === \"success\") {\n        console.log(\"VRP Solution:\", data.routes)\n        this.renderRoutes(data.routes)\n      } else {\n        alert(\"Error solving VRP: \" + data.message)\n      }\n    } catch (error) {\n      console.error(\"Error:\", error)\n      alert(\"An error occurred while communicating with the solver.\")\n    }\n  }\n\n  renderRoutes(locations) {\n    // Remove existing layers and sources if any\n    if (this.map.getSource(\'route\')) {\n      this.map.removeLayer(\'route\');\n      this.map.removeSource(\'route\');\n    }\n\n    this.map.addSource(\'route\', {\n      type: \'geojson\',\n      data: {\n        type: \'Feature\',\n        properties: {},\n        geometry: {\n          type: \'LineString\',\n          coordinates: locations\n        }\n      }\n    });\n\n    this.map.addLayer({\n      id: \'route\',\n      type: \'line\',\n      source: \'route\',\n      layout: {\n        \'line-join\': \'round\',\n        \'line-cap\': \'round\'\n      },\n      paint: {\n        \'line-color\': \'#888\',\n        \'line-width\': 8\n      }\n    });\n\n    // Fit map to the route\n    const bounds = new mapboxgl.LngLatBounds();\n    for (const coord of locations) {\n      bounds.extend(coord);\n    }\n    this.map.fitBounds(bounds, { padding: 20 });\n  }\n}\n
+import { Controller } from "@hotwired/stimulus"
+import mapboxgl from "mapbox-gl"
+
+// Connects to data-controller="vrp"
+export default class extends Controller {
+  static values = {
+    accessToken: String,
+  }
+
+  static targets = ["locationsInput", "canvas"]
+
+  connect() {
+    mapboxgl.accessToken = this.accessTokenValue
+
+    if (!this.hasCanvasTarget) {
+      console.error("vrp controller: missing canvas target")
+      return
+    }
+
+    this.map = new mapboxgl.Map({
+      container: this.canvasTarget,
+      style: "mapbox://styles/mapbox/streets-v12",
+      center: [-74.5, 40],
+      zoom: 12,
+      pitch: 60,
+      bearing: -17.6,
+      antialias: true,
+    })
+
+    this.map.on("style.load", () => {
+      if (!this.map.getSource("mapbox-dem")) {
+        this.map.addSource("mapbox-dem", {
+          type: "raster-dem",
+          url: "mapbox://mapbox.mapbox-terrain-dem-v1",
+          tileSize: 512,
+          maxzoom: 14,
+        })
+      }
+
+      this.map.setTerrain({ source: "mapbox-dem", exaggeration: 1.5 })
+
+      if (!this.map.getLayer("sky")) {
+        this.map.addLayer({
+          id: "sky",
+          type: "sky",
+          paint: {
+            "sky-type": "atmosphere",
+            "sky-atmosphere-sun-intensity": 15,
+          },
+        })
+      }
+    })
+  }
+
+  async solve(event) {
+    event.preventDefault()
+
+    const locations = this.locationsInputTarget.value
+      .split(/\n/)
+      .map(line => {
+        const [lat, lng] = line.split(",").map(coord => parseFloat(coord.trim()))
+        return [lng, lat]
+      })
+      .filter(coord => !isNaN(coord[0]) && !isNaN(coord[1]))
+
+    if (locations.length === 0) {
+      alert("Please enter at least one location.")
+      return
+    }
+
+    try {
+      const response = await fetch("/vrp/solve", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
+        },
+        body: JSON.stringify({ vrp: { locations } }),
+      })
+
+      const data = await response.json()
+
+      if (data.status === "success") {
+        console.log("VRP Solution:", data.routes)
+        this.renderRoutes(data.routes)
+      } else {
+        alert("Error solving VRP: " + data.message)
+      }
+    } catch (error) {
+      console.error("Error:", error)
+      alert("An error occurred while communicating with the solver.")
+    }
+  }
+
+  renderRoutes(locations) {
+    if (this.map.getSource("route")) {
+      this.map.removeLayer("route")
+      this.map.removeSource("route")
+    }
+
+    this.map.addSource("route", {
+      type: "geojson",
+      data: {
+        type: "Feature",
+        properties: {},
+        geometry: {
+          type: "LineString",
+          coordinates: locations,
+        },
+      },
+    })
+
+    this.map.addLayer({
+      id: "route",
+      type: "line",
+      source: "route",
+      layout: {
+        "line-join": "round",
+        "line-cap": "round",
+      },
+      paint: {
+        "line-color": "#888",
+        "line-width": 8,
+      },
+    })
+
+    const bounds = new mapboxgl.LngLatBounds()
+    for (const coord of locations) {
+      bounds.extend(coord)
+    }
+    this.map.fitBounds(bounds, { padding: 20 })
+  }
+}
