@@ -1,0 +1,27 @@
+<div class="rounded-[24px] border border-[#2E3440] bg-[#1F2937] p-6 shadow-xl">
+  <div class="mb-4 flex items-center justify-between">
+    <h2 class="text-xs uppercase tracking-[0.4em] text-slate-400">Run history</h2>
+    <div class="flex items-center gap-3 text-xs">
+      <button type="button" class="text-slate-400 transition hover:text-slate-200" data-action="vrp#demoRun">Run demo</button>
+      <button type="button" class="text-slate-500 transition hover:text-slate-300" data-action="vrp#clearHistory">Clear</button>
+    </div>
+  </div>
+  <div class="overflow-hidden rounded-2xl border border-[#2E3440]">
+    <table class="min-w-full divide-y divide-[#2E3440] text-sm">
+      <thead class="bg-slate-900/80 text-xs uppercase tracking-[0.3em] text-slate-400">
+        <tr>
+          <th class="px-4 py-3 text-left">Timestamp</th>
+          <th class="px-4 py-3 text-left">Strategy</th>
+          <th class="px-4 py-3 text-left">Distance</th>
+          <th class="px-4 py-3 text-left">Runtime</th>
+          <th class="px-4 py-3 text-left">Action</th>
+        </tr>
+      </thead>
+      <tbody data-vrp-target="history" class="divide-y divide-[#2E3440] bg-slate-950/60 text-slate-300">
+        <tr>
+          <td colspan="5" class="px-4 py-6 text-center text-slate-500">No missions yet. Launch one or try the demo to see activity.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
