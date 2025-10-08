@@ -81,6 +81,54 @@ server. `docs/cloud_deploy.md` covers:
 3. Building images, running migrations, and starting services.
 4. Rolling updates, backups, and troubleshooting tips.
 
+## Front-end diagnostics (Mapbox & buttons)
+
+If the VRP map never appears or buttons such as “Run Demo”, “Launch Mission”,
+or “Clear” stop responding, assume the front-end JavaScript bundle is not
+initialising. The checklist below audits that pipeline end-to-end.
+
+### CLI audit checklist
+
+```bash
+# Confirm Stimulus controllers are discoverable and the layout loads JS tags
+ls app/javascript
+cat app/views/layouts/application.html.erb | grep javascript
+
+# Inspect the generated import map for the application entry point
+bin/importmap json | jq '.imports.application'
+
+# Run a production-parity asset build and confirm JS output exists
+RAILS_ENV=production bin/rails assets:precompile
+ls public/assets | grep js
+
+# Rebuild Tailwind utilities used by the Mapbox layout
+RAILS_ENV=production bin/rails tailwind:build
+
+# Ensure the Content Security Policy allows Mapbox hosts and web workers
+grep -R "content_security_policy" config/initializers
+
+# Verify the Mapbox token is present in the deployed environment
+echo $MAPBOX_ACCESS_TOKEN
+
+# Restart the service and watch for runtime JavaScript or CSP errors
+sudo systemctl restart mve-dashboard
+sudo journalctl -u mve-dashboard -n 40 --no-pager
+```
+
+### Cache reset workflow
+
+When assets appear stale, clear caches before re-running the production build
+and restarting:
+
+```bash
+rm -rf tmp/cache public/assets
+RAILS_ENV=production bin/rails assets:precompile
+sudo systemctl restart mve-dashboard
+```
+
+Re-open the app in Chrome DevTools → Console to confirm Turbo, Stimulus, and
+Mapbox initialise without errors after the restart.
+
 ## API Contract
 
 ### Create Job
