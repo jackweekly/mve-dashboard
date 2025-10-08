@@ -4,22 +4,17 @@
 # See the Securing Rails Applications Guide for more information:
 # https://guides.rubyonrails.org/security.html#content-security-policy-header
 
-# Rails.application.configure do
-#   config.content_security_policy do |policy|
-#     policy.default_src :self, :https
-#     policy.font_src    :self, :https, :data
-#     policy.img_src     :self, :https, :data
-#     policy.object_src  :none
-#     policy.script_src  :self, :https
-#     policy.style_src   :self, :https
-#     # Specify URI for violation reports
-#     # policy.report_uri "/csp-violation-report-endpoint"
-#   end
-#
-#   # Generate session nonces for permitted importmap, inline scripts, and inline styles.
-#   config.content_security_policy_nonce_generator = ->(request) { request.session.id.to_s }
-#   config.content_security_policy_nonce_directives = %w(script-src style-src)
-#
-#   # Report violations without enforcing the policy.
-#   # config.content_security_policy_report_only = true
-# end
+Rails.application.config.content_security_policy do |p|
+  p.default_src :none
+  p.base_uri    :self
+  p.script_src  :self, :https
+  p.style_src   :self, :https
+  p.img_src     :self, :https, :data
+  p.font_src    :self, :https, :data
+  p.connect_src :self, :https
+  p.frame_ancestors :none
+  p.form_action :self
+  p.block_all_mixed_content
+  p.upgrade_insecure_requests
+end
+Rails.application.config.content_security_policy_nonce_generator = -> req { SecureRandom.base64(16) }

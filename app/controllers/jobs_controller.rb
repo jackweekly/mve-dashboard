@@ -66,8 +66,9 @@ class JobsController < ApplicationController
   end
 
   def current_user
-    # Placeholder until authentication is implemented
-    User.first || User.create!(email: "admin@example.com", password: "password", role: "admin")
+    # TODO: Implement proper user authentication and retrieval here.
+    # This placeholder was removed due to security concerns regarding hardcoded credentials.
+    nil # Or raise an error if no user is authenticated
   end
 
   def format_params(hash)
