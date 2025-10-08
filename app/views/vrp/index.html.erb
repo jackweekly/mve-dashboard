@@ -1,9 +1,192 @@
-<div data-controller="vrp" data-vrp-access-token-value="<%= ENV['MAPBOX_ACCESS_TOKEN'] %>" style="width: 100%; height: 500px;" class="relative">
-  <div data-vrp-target="canvas" class="h-full w-full"></div>
-  <div class="map-overlay">
-    <form data-action="submit->vrp#solve">
-      <textarea data-vrp-target="locationsInput" placeholder="Enter locations (lat,lng per line)"></textarea>
-      <button type="submit">Solve VRP</button>
-    </form>
-  </div>
+<div
+  data-controller="vrp"
+  data-vrp-access-token-value="<%= ENV['MAPBOX_ACCESS_TOKEN'] %>"
+  class="grid gap-6 xl:grid-cols-[minmax(0,_65%)_minmax(0,_35%)] text-slate-200"
+  style="min-height: 70vh;"
+>
+  <section class="relative overflow-hidden rounded-3xl bg-slate-950 shadow-lg">
+    <div data-vrp-target="canvas" class="absolute inset-0"></div>
+
+    <div class="pointer-events-none absolute inset-x-4 top-4 flex flex-wrap gap-3 text-sm font-medium">
+      <div class="pointer-events-auto rounded-2xl bg-slate-900/80 px-4 py-3 shadow-lg backdrop-blur">
+        <h3 class="text-xs uppercase tracking-wide text-slate-400">Legend</h3>
+        <dl class="mt-2 space-y-2">
+          <div class="flex items-center gap-2">
+            <span class="h-2 w-6 rounded-full bg-cyan-400"></span>
+            <dt class="text-slate-300">Active Route</dt>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="h-2 w-6 rounded-full bg-pink-400"></span>
+            <dt class="text-slate-300">Ghost Run</dt>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="h-3 w-3 rounded-full border border-cyan-200 bg-slate-950"></span>
+            <dt class="text-slate-300">Depot</dt>
+          </div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="pointer-events-auto absolute bottom-4 left-4 right-4 flex flex-col gap-3 rounded-2xl bg-slate-900/80 p-4 text-sm shadow-lg backdrop-blur">
+      <div class="flex items-center justify-between">
+        <h3 class="text-xs uppercase tracking-wide text-slate-400">Live Activity</h3>
+        <span data-vrp-target="statusBadge" class="inline-flex items-center rounded-full bg-amber-500/20 px-3 py-1 text-xs font-semibold text-amber-300">Idle</span>
+      </div>
+      <div class="h-32 overflow-y-auto pr-2 text-slate-300" data-vrp-target="log"></div>
+    </div>
+  </section>
+
+  <section class="flex flex-col gap-6">
+    <div class="rounded-3xl bg-slate-950 p-6 shadow-lg">
+      <div class="mb-6 flex items-center justify-between">
+        <div>
+          <h2 class="text-xl font-semibold text-slate-100">Configure Job</h2>
+          <p class="text-sm text-slate-400">Start from sensible defaults and refine only when needed.</p>
+        </div>
+        <button
+          type="button"
+          class="rounded-full border border-slate-700 px-3 py-1 text-xs font-semibold text-slate-300 transition hover:border-slate-500 hover:text-slate-100"
+          data-action="vrp#resetConfig"
+        >Reset</button>
+      </div>
+
+      <form data-vrp-target="configForm" data-action="submit->vrp#solve" class="space-y-5">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <label class="flex flex-col gap-2">
+            <span class="text-sm font-medium text-slate-300">Number of Vehicles</span>
+            <input type="number" min="1" max="50" step="1" data-vrp-target="vehicleCount" class="rounded-2xl border border-slate-700 bg-slate-900 px-4 py-2 text-slate-100 focus:border-cyan-400 focus:outline-none" />
+          </label>
+
+          <label class="flex flex-col gap-2">
+            <span class="text-sm font-medium text-slate-300">Vehicle Capacity</span>
+            <input type="number" min="1" step="1" data-vrp-target="vehicleCapacity" class="rounded-2xl border border-slate-700 bg-slate-900 px-4 py-2 text-slate-100 focus:border-cyan-400 focus:outline-none" />
+          </label>
+
+          <label class="flex flex-col gap-2">
+            <span class="text-sm font-medium text-slate-300">Max Route Distance (km)</span>
+            <input type="number" min="10" step="5" data-vrp-target="maxDistance" class="rounded-2xl border border-slate-700 bg-slate-900 px-4 py-2 text-slate-100 focus:border-cyan-400 focus:outline-none" />
+          </label>
+
+          <label class="flex flex-col gap-2">
+            <span class="text-sm font-medium text-slate-300">Solver Strategy</span>
+            <select data-vrp-target="solverType" class="rounded-2xl border border-slate-700 bg-slate-900 px-4 py-2 text-slate-100 focus:border-cyan-400 focus:outline-none">
+              <option value="tabu">Tabu Search</option>
+              <option value="sim_anneal">Simulated Annealing</option>
+              <option value="quantum">Quantum Hybrid</option>
+              <option value="greedy">Greedy Heuristic</option>
+            </select>
+          </label>
+        </div>
+
+        <label class="flex flex-col gap-2">
+          <span class="text-sm font-medium text-slate-300">Locations</span>
+          <textarea
+            data-vrp-target="locationsInput"
+            class="h-32 rounded-2xl border border-slate-700 bg-slate-900 px-4 py-3 text-slate-100 focus:border-cyan-400 focus:outline-none"
+            placeholder="lat,lng per line. Depot first, followed by stops."
+          ></textarea>
+        </label>
+
+        <div class="flex items-center justify-between text-xs text-slate-500">
+          <p>Changes apply when you launch a new run. Hover any label to learn more.</p>
+          <label class="inline-flex items-center gap-2 text-slate-300">
+            <input type="checkbox" data-vrp-target="autoReplay" class="h-4 w-4 rounded border-slate-700 bg-slate-900 text-cyan-400 focus:ring-cyan-500" />
+            Auto replay last run
+          </label>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button
+            type="submit"
+            class="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl bg-cyan-500 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-500"
+            data-vrp-target="launchButton"
+          >
+            <span class="hidden" data-vrp-target="launchSpinner">
+              <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                <circle class="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-90" d="M22 12a10 10 0 0 1-10 10" stroke="currentColor" stroke-linecap="round" stroke-width="4"></path>
+              </svg>
+            </span>
+            <span data-vrp-target="launchLabel">Launch Solver</span>
+          </button>
+
+          <button
+            type="button"
+            class="inline-flex items-center justify-center rounded-2xl border border-slate-700 px-4 py-3 text-sm font-semibold text-slate-300 transition hover:border-slate-500 hover:text-slate-100"
+            data-action="vrp#pauseReplay"
+            data-vrp-target="pauseButton"
+            disabled
+          >Pause</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="rounded-3xl bg-slate-950 p-6 shadow-lg">
+      <div class="mb-4 flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-slate-100">Status</h2>
+        <span data-vrp-target="statusLabel" class="text-xs font-semibold uppercase tracking-wide text-slate-500">Idle</span>
+      </div>
+      <div class="space-y-4">
+        <div>
+          <div class="flex items-center justify-between text-xs text-slate-400">
+            <span>Progress</span>
+            <span data-vrp-target="progressValue">0%</span>
+          </div>
+          <div class="mt-2 h-2 rounded-full bg-slate-800">
+            <div data-vrp-target="progressBar" class="h-full w-0 rounded-full bg-cyan-400 transition-all"></div>
+          </div>
+        </div>
+
+        <dl class="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <dt class="text-slate-400">Total Distance</dt>
+            <dd data-vrp-target="metricDistance" class="text-lg font-semibold text-slate-100">—</dd>
+          </div>
+          <div>
+            <dt class="text-slate-400">Elapsed</dt>
+            <dd data-vrp-target="metricElapsed" class="text-lg font-semibold text-slate-100">—</dd>
+          </div>
+          <div>
+            <dt class="text-slate-400">Fleet Usage</dt>
+            <dd data-vrp-target="metricFleet" class="text-lg font-semibold text-slate-100">—</dd>
+          </div>
+          <div>
+            <dt class="text-slate-400">Constraint Alerts</dt>
+            <dd data-vrp-target="metricViolations" class="text-lg font-semibold text-slate-100">—</dd>
+          </div>
+        </dl>
+
+        <button
+          type="button"
+          class="inline-flex items-center gap-2 text-sm font-semibold text-cyan-300 transition hover:text-cyan-200"
+          data-action="vrp#compareRuns"
+        >Compare with last run →</button>
+      </div>
+    </div>
+
+    <div class="rounded-3xl bg-slate-950 p-6 shadow-lg">
+      <div class="mb-4 flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-slate-100">Run History</h2>
+        <button type="button" class="text-xs font-semibold text-slate-500 transition hover:text-slate-300" data-action="vrp#clearHistory">Clear</button>
+      </div>
+      <div class="overflow-hidden rounded-2xl border border-slate-800">
+        <table class="min-w-full divide-y divide-slate-800 text-sm">
+          <thead class="bg-slate-900/80 text-xs uppercase tracking-wide text-slate-400">
+            <tr>
+              <th class="px-4 py-3 text-left">Timestamp</th>
+              <th class="px-4 py-3 text-left">Strategy</th>
+              <th class="px-4 py-3 text-left">Distance</th>
+              <th class="px-4 py-3 text-left">Runtime</th>
+              <th class="px-4 py-3 text-left">Action</th>
+            </tr>
+          </thead>
+          <tbody data-vrp-target="history" class="divide-y divide-slate-900 bg-slate-950/70 text-slate-300">
+            <tr>
+              <td colspan="5" class="px-4 py-6 text-center text-slate-500">No runs yet. Launch the solver to populate history.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
 </div>
