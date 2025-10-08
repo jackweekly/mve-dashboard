@@ -1,4 +1,5 @@
 class JobsController < ApplicationController
+  skip_before_action :verify_authenticity_token, only: :create, if: -> { request.format.json? }
   before_action :set_job, only: [:show, :duplicate]
 
   def index
@@ -14,16 +15,22 @@ class JobsController < ApplicationController
   end
 
   def create
-    @job = Job.new(job_attributes)
+    @job = Job.new(job_params)
     @job.user = current_user
 
-    if assign_params(@job, params_json: params.dig(:job, :params_json)) && @job.save
-      @job.broadcast_status
+    if @job.save
       RunJobWorker.perform_async(@job.id)
-      redirect_to job_path(@job), notice: "Job was successfully queued."
+      respond_to do |format|
+        format.turbo_stream
+        format.html { redirect_to job_path(@job), notice: "Job was successfully queued." }
+        format.json { render json: { id: @job.id }, status: :created }
+      end
     else
       @params_json = params.dig(:job, :params_json)
-      render :new, status: :unprocessable_entity
+      respond_to do |format|
+        format.html { render :new, status: :unprocessable_entity }
+        format.json { render json: @job.errors, status: :unprocessable_entity }
+      end
     end
   end
 
@@ -52,17 +59,10 @@ class JobsController < ApplicationController
     @job = Job.find(params[:id])
   end
 
-  def job_attributes
-    params.require(:job).permit(:problem_type, :solver, :seed)
-  end
-
-  def assign_params(job, params_json:)
-    raw = params_json.to_s
-    job.params = raw.present? ? JSON.parse(raw) : {}
-    true
-  rescue JSON::ParserError => e
-    job.errors.add(:params, "must be valid JSON (#{e.message.split(':').last&.strip})")
-    false
+  def job_params
+    params.require(:job).permit(:problem_type, :solver, :seed).tap do |whitelisted|
+      whitelisted[:params] = params.require(:job).fetch(:params, ActionController::Parameters.new).permit!
+    end
   end
 
   def current_user

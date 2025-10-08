@@ -158,52 +158,60 @@ export default class extends Controller {
     }
   }
 
-  async solve(event) {
-    event.preventDefault()
+  serializeConfig() {
+    const config = this.collectConfig();
+    const locations = this.parseLocations();
+    return { ...config, locations };
+  }
 
-    const config = this.collectConfig()
-    const locations = this.parseLocations()
+  async solve(e) {
+    e.preventDefault()
 
-    if (locations.length === 0) {
+    const config = this.serializeConfig()
+
+    if (config.locations.length === 0) {
       this.appendLog("Provide at least one coordinate pair to launch.", "warn")
       return
     }
 
-    this.beginMission()
-    this.appendLog(`Launching ${config.solverType} mission with ${config.vehicleCount} vehicles…`)
-
-    try {
-      const response = await fetch("/vrp/solve", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
-        },
-        body: JSON.stringify({
-          vrp: {
-            locations,
-            vehicle_count: config.vehicleCount,
-            vehicle_capacity: config.vehicleCapacity,
-            max_distance: config.maxDistance,
-            solver_type: config.solverType,
-          },
-        }),
-      })
-
-      if (!response.ok) throw new Error(`Server responded with ${response.status}`)
-
-      const data = await response.json()
-      const routes = data?.routes || []
-      const metrics = data?.metrics || {}
-      const elapsedSeconds = data?.elapsed_seconds
-
-      this.completeMission({ routes, metrics, elapsedSeconds, config })
-      this.concludeMission()
-    } catch (error) {
-      console.error(error)
-      this.failMission(error)
-      this.concludeMission()
+    const token = document.querySelector('meta[name="csrf-token"]')?.content
+    const payload = {
+      job: {
+        problem_type: "vrp",
+        solver: config.solverType || "demo",
+        seed: Math.floor(Math.random() * 10000),
+        params: config
+      }
     }
+
+    this.showLaunchMoment()
+    this.appendLog(`Launching ${payload.job.solver} mission…`)
+
+    fetch("/jobs", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": token,
+        "Accept": "text/vnd.turbo-stream.html"
+      },
+      credentials: "same-origin",
+      body: JSON.stringify(payload)
+    })
+    .then(r => {
+      if (!r.ok) {
+        throw new Error(`Server responded with ${r.status}`)
+      }
+      return r.text()
+    })
+    .then(html => {
+      if (html) {
+          Turbo.renderStreamMessage(html)
+      }
+      this.appendLog("Mission queued.", "success")
+    })
+    .catch(err => {
+      this.failMission(err)
+    })
   }
 
   beginMission() {

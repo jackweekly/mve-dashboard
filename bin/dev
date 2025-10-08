@@ -16,4 +16,4 @@ export RUBY_DEBUG_LAZY="true"
 mkdir -p tmp/pids
 rm -f tmp/pids/server.pid
 
-exec foreman start -f Procfile.dev "$@"
+exec bundle exec foreman start -f Procfile.dev "$@"
