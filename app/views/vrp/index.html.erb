@@ -66,25 +66,25 @@
 
       <form data-vrp-target="configForm" data-action="submit->vrp#solve" class="space-y-6">
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <label class="flex flex-col gap-2 text-sm">
+          <label class="group relative flex flex-col gap-2 text-sm">
             <span class="text-slate-400">Number of vehicles</span>
             <input type="number" min="1" max="50" step="1" data-vrp-target="vehicleCount" class="rounded-2xl border border-[#2E3440] bg-slate-900 px-4 py-2 text-slate-100 focus:border-[#00B8D9] focus:outline-none" />
-            <span class="text-xs text-slate-500">How many vehicles you’re dispatching on this mission.</span>
+            <span class="absolute left-0 top-full mt-1 hidden rounded-md bg-slate-700 px-2 py-1 text-xs text-slate-200 opacity-0 transition-opacity group-hover:block group-hover:opacity-100">How many vehicles you’re dispatching on this mission.</span>
           </label>
 
-          <label class="flex flex-col gap-2 text-sm">
+          <label class="group relative flex flex-col gap-2 text-sm">
             <span class="text-slate-400">Vehicle capacity</span>
             <input type="number" min="1" step="1" data-vrp-target="vehicleCapacity" class="rounded-2xl border border-[#2E3440] bg-slate-900 px-4 py-2 text-slate-100 focus:border-[#00B8D9] focus:outline-none" />
-            <span class="text-xs text-slate-500">Maximum load each vehicle can carry.</span>
+            <span class="absolute left-0 top-full mt-1 hidden rounded-md bg-slate-700 px-2 py-1 text-xs text-slate-200 opacity-0 transition-opacity group-hover:block group-hover:opacity-100">Maximum load each vehicle can carry.</span>
           </label>
 
-          <label class="flex flex-col gap-2 text-sm">
+          <label class="group relative flex flex-col gap-2 text-sm">
             <span class="text-slate-400">Max route distance (km)</span>
             <input type="number" min="10" step="5" data-vrp-target="maxDistance" class="rounded-2xl border border-[#2E3440] bg-slate-900 px-4 py-2 text-slate-100 focus:border-[#00B8D9] focus:outline-none" />
-            <span class="text-xs text-slate-500">Limits total distance a vehicle can travel this run.</span>
+            <span class="absolute left-0 top-full mt-1 hidden rounded-md bg-slate-700 px-2 py-1 text-xs text-slate-200 opacity-0 transition-opacity group-hover:block group-hover:opacity-100">Limits total distance a vehicle can travel this run.</span>
           </label>
 
-          <label class="flex flex-col gap-2 text-sm">
+          <label class="group relative flex flex-col gap-2 text-sm">
             <span class="text-slate-400">Solver strategy</span>
             <select data-vrp-target="solverType" class="rounded-2xl border border-[#2E3440] bg-slate-900 px-4 py-2 text-slate-100 focus:border-[#6366F1] focus:outline-none">
               <option value="tabu">Tabu Search</option>
@@ -92,18 +92,18 @@
               <option value="quantum">Quantum Hybrid</option>
               <option value="greedy">Greedy Heuristic</option>
             </select>
-            <span class="text-xs text-slate-500">Choose the optimization engine best suited to your scenario.</span>
+            <span class="absolute left-0 top-full mt-1 hidden rounded-md bg-slate-700 px-2 py-1 text-xs text-slate-200 opacity-0 transition-opacity group-hover:block group-hover:opacity-100">Choose the optimization engine best suited to your scenario.</span>
           </label>
         </div>
 
-        <label class="flex flex-col gap-2 text-sm">
+        <label class="group relative flex flex-col gap-2 text-sm">
           <span class="text-slate-400">Locations</span>
           <textarea
             data-vrp-target="locationsInput"
             class="h-32 rounded-2xl border border-[#2E3440] bg-slate-900 px-4 py-3 text-slate-100 focus:border-[#6366F1] focus:outline-none"
             placeholder="lat,lng per line. Depot first, followed by stops."
           ></textarea>
-          <span class="text-xs text-slate-500">Paste coordinates or import from CSV (coming soon).</span>
+          <span class="absolute left-0 top-full mt-1 hidden rounded-md bg-slate-700 px-2 py-1 text-xs text-slate-200 opacity-0 transition-opacity group-hover:block group-hover:opacity-100">Paste coordinates or import from CSV (coming soon).</span>
         </label>
 
         <div class="flex items-center justify-between text-xs text-slate-500">
