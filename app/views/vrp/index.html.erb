@@ -1,7 +1,7 @@
 <div
   data-controller="vrp"
   data-vrp-access-token-value="<%= ENV['MAPBOX_ACCESS_TOKEN'] %>"
-  class="text-slate-200 lg:grid lg:grid-cols-[70%_30%] lg:gap-8"
+  class="flex flex-col gap-8 text-slate-200 lg:grid lg:grid-cols-[70%_30%] lg:gap-8"
   style="min-height: calc(100vh - 7rem);"
 >
   <%= render "vrp/map" %>
