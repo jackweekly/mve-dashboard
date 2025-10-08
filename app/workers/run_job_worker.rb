@@ -8,8 +8,8 @@ class RunJobWorker
 
     transition(job, status: :running, progress: 5)
 
-    creation = PythonClient.create_job(job)
-    transition(job, external_id: creation.external_id, progress: 25)
+    creation = PythonClient.solve_vrp(job.params)
+    transition(job, external_id: creation["external_id"], progress: 25)
 
     3.times do |step|
       pause 0.75

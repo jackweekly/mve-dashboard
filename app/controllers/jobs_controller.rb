@@ -66,9 +66,7 @@ class JobsController < ApplicationController
   end
 
   def current_user
-    # TODO: Implement proper user authentication and retrieval here.
-    # This placeholder was removed due to security concerns regarding hardcoded credentials.
-    nil # Or raise an error if no user is authenticated
+    User.first # Temporary: Implement proper user authentication and retrieval here.
   end
 
   def format_params(hash)

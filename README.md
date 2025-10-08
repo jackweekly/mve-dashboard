@@ -46,6 +46,18 @@ The app boots on `http://localhost:3000`. Default basic-auth credentials are
 `admin` / `password` (override with env vars). Sidekiq’s web UI is available at
 `/sidekiq` and uses `SIDEKIQ_WEB_USERNAME/SIDEKIQ_WEB_PASSWORD`.
 
+### Restarting the server
+
+To restart the application server:
+
+*   **For local development (using `bin/dev`):**
+    Stop the running `bin/dev` process (usually by pressing `Ctrl+C` in the terminal) and then run `bin/dev` again.
+
+*   **For server environments (using `systemd`):**
+    ```bash
+    sudo systemctl restart mve-dashboard
+    ```
+
 ### Environment variables (development)
 
 - `BASIC_AUTH_USERNAME`, `BASIC_AUTH_PASSWORD` – guard the UI.

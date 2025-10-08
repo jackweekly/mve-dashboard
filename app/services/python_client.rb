@@ -10,6 +10,10 @@ class PythonClient
     new(nil).solve_vrp(params)
   end
 
+  def self.fetch_results(job)
+    new(job).fetch_results_instance
+  end
+
   def initialize(job)
     @job = job
     @base_url = DEFAULT_BASE_URL
@@ -27,6 +31,20 @@ class PythonClient
     JSON.parse(response.body)
   rescue StandardError => e
     Rails.logger.error("[PythonClient] Error solving VRP: \#{e.message}")
+    { "status" => "error", "message" => e.message }
+  end
+
+  def fetch_results_instance
+    uri = URI("#{@base_url}/results/#{@job.external_id}")
+    http = Net::HTTP.new(uri.host, uri.port)
+    request = Net::HTTP::Get.new(uri.path)
+
+    Rails.logger.info("[PythonClient] GET \#{uri}")
+    response = http.request(request)
+
+    JSON.parse(response.body)
+  rescue StandardError => e
+    Rails.logger.error("[PythonClient] Error fetching results: \#{e.message}")
     { "status" => "error", "message" => e.message }
   end
 end
