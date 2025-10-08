@@ -4,7 +4,7 @@ require "json"
 
 # PythonClient encapsulates communication with the optimization engine.
 class PythonClient
-  DEFAULT_BASE_URL = ENV.fetch("PY_SERVICE_URL", "http://localhost:8000").freeze
+  DEFAULT_BASE_URL = ENV.fetch("PY_SERVICE_URL", "http://localhost:8001").freeze
 
   def self.solve_vrp(params)
     new(nil).solve_vrp(params)

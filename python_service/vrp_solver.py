@@ -1,3 +1,5 @@
+import argparse
+import sys
 from flask import Flask, request, jsonify
 import numpy as np
 import random
@@ -278,4 +280,7 @@ def solve_vrp_endpoint():
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000)
+    parser = argparse.ArgumentParser(description='Run the VRP solver Flask app.')
+    parser.add_argument('-p', '--port', type=int, default=8000, help='Port to run the Flask app on.')
+    args = parser.parse_args()
+    app.run(host='0.0.0.0', port=args.port)

@@ -13,8 +13,8 @@ Rails.application.config.content_security_policy do |p|
 
   p.default_src :none
   p.base_uri    :self
-  p.script_src  :self, :https, *mapbox_hosts
-  p.style_src   :self, :https, *mapbox_hosts
+  p.script_src  :self, :https, *mapbox_hosts, :unsafe_inline
+  p.style_src   :self, :https, *mapbox_hosts, :unsafe_inline
   p.img_src     :self, :https, :data, *mapbox_hosts
   p.font_src    :self, :https, :data, 'https://api.mapbox.com'
   p.connect_src :self, :https, *mapbox_hosts
@@ -24,4 +24,3 @@ Rails.application.config.content_security_policy do |p|
   p.block_all_mixed_content
   p.upgrade_insecure_requests
 end
-Rails.application.config.content_security_policy_nonce_generator = -> req { SecureRandom.base64(16) }

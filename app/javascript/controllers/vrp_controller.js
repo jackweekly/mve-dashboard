@@ -100,6 +100,7 @@ export default class extends Controller {
   }
 
   initializeMap() {
+    console.log("initializeMap called.")
     if (!this.hasCanvasTarget) {
       console.error("vrp controller: missing canvas target")
       return
@@ -114,6 +115,8 @@ export default class extends Controller {
       bearing: -20,
       antialias: true,
     })
+
+    console.log("Canvas target dimensions:", this.canvasTarget.offsetWidth, this.canvasTarget.offsetHeight)
 
     this.map.on("style.load", () => {
       console.log("Mapbox style loaded.")
