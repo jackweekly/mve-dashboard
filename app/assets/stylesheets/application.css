@@ -3,3 +3,34 @@
 @tailwind utilities;
 
 @import 'mapbox-gl/dist/mapbox-gl.css';
+
+@keyframes launch-surge {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(0, 184, 217, 0.45);
+  }
+  60% {
+    transform: scale(1.02);
+    box-shadow: 0 0 45px 12px rgba(0, 184, 217, 0.25);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(0, 184, 217, 0.0);
+  }
+}
+
+@keyframes pulse_2s_infinite {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+
+.launch-pulse {
+  animation: launch-surge 0.8s ease-in-out both;
+}
