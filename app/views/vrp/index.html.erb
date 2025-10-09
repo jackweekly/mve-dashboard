@@ -6,6 +6,9 @@
 >
   <%= render "vrp/map" %>
 
+<%= turbo_stream_from :jobs %>
+<div id="vrp-recent-jobs"></div>
+
   <section class="flex flex-col gap-6 lg:sticky lg:top-24 lg:h-[calc(100vh-9rem)] lg:overflow-y-auto lg:pb-6">
     <%= render "vrp/configure_mission" %>
 

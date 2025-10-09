@@ -1,0 +1,6 @@
+<%= turbo_stream.append "log" do %>
+  <div class="flex items-start gap-2 text-xs text-rose-300">
+    <span class="text-slate-500"><%= Time.now.strftime("%H:%M:%S") %></span>
+    <span>Validation failed: <%= @job.errors.full_messages.to_sentence %></span>
+  </div>
+<% end %>

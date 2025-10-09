@@ -14,15 +14,19 @@ class Job < ApplicationRecord
 
   scope :recent, -> { order(created_at: :desc) }
 
+  after_update_commit do
+    broadcast_replace_to(
+      "jobs",
+      target: dom_id(self),               # id on the <tr> (e.g., id="<%= dom_id(job) %>")
+      partial: "jobs/job_row",
+      locals: { job: self }
+    )
+  end
+
   def broadcast_status
     broadcast_replace_later_to self,
                                target: dom_id(self, :status),
                                partial: "jobs/status",
-                               locals: { job: self }
-
-    broadcast_replace_later_to :jobs,
-                               target: dom_id(self),
-                               partial: "jobs/job_row",
                                locals: { job: self }
   end
 

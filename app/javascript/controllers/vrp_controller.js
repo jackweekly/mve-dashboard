@@ -45,6 +45,20 @@ export default class extends Controller {
   ]
 
   connect() {
+    console.log("[vrp] controller connected");
+    // one-time fetch logging shim (very useful while debugging)
+    if (!window.__fetch_logged) {
+      const orig = window.fetch;
+      window.fetch = (...args) => {
+        console.log("[fetch] →", args[0], args[1]);
+        return orig(...args).then(res => {
+          console.log("[fetch] ←", res.status, res.headers.get("content-type"));
+          return res;
+        });
+      };
+      window.__fetch_logged = true;
+    }
+
     mapboxgl.accessToken = this.accessTokenValue
 
     this.defaults = {
@@ -164,54 +178,72 @@ export default class extends Controller {
     return { ...config, locations };
   }
 
-  async solve(e) {
-    e.preventDefault()
+  solve(event) {
+    try {
+      event?.preventDefault();
 
-    const config = this.serializeConfig()
+      const token = document.querySelector('meta[name="csrf-token"]')?.content;
+      if (!token) {
+        console.warn("[vrp] Missing CSRF token in <meta>. Add <%= csrf_meta_tags %> in layouts/application.html.erb");
+      }
 
-    if (config.locations.length === 0) {
-      this.appendLog("Provide at least one coordinate pair to launch.", "warn")
-      return
+      // Gather your mission config from the form / map / inputs.
+      // At minimum, Rails expects job-like params. We'll use conventional nested params.
+      const fd = new FormData(this.configFormTarget);
+
+      // Ensure required fields are present (adjust as needed)
+      fd.append("job[problem_type]", "vrp");
+      // If you have solver/seed/etc in the form already, omit these appends.
+      if (!fd.has("job[solver]")) fd.append("job[solver]", "demo");
+      if (!fd.has("job[seed]")) fd.append("job[seed]", "1");
+
+      // If you need to send JSON params, stringify and append:
+      if (!fd.has("job[params]")) fd.append("job[params]", JSON.stringify({}));
+
+      // UI feedback
+      this.showLaunchMoment();
+      if (this.hasLaunchLabelTarget) this.launchLabelTarget.textContent = "Launching…";
+      if (this.hasLaunchSpinnerTarget) this.launchSpinnerTarget.classList.remove("hidden");
+
+      fetch("/jobs", {
+        method: "POST",
+        headers: {
+          "X-CSRF-Token": token,
+          // Ask Rails to return a Turbo Stream so your create.turbo_stream.erb runs
+          "Accept": "text/vnd.turbo-stream.html"
+        },
+        body: fd,
+        credentials: "same-origin"
+      })
+      .then(async (res) => {
+        const ct = res.headers.get("content-type") || "";
+        console.log("[vrp] /jobs response", res.status, ct);
+
+        // If it’s Turbo Stream, simply reading the body triggers Turbo to process it
+        const body = await res.text();
+        if (ct.includes("turbo-stream")) {
+          // Turbo will process automatically if the response is navigated; when using fetch,
+          // explicitly process it:
+          Turbo.renderStreamMessage(body);
+        } else if (res.ok) {
+          console.log("[vrp] Non-turbo OK; server returned:", body.slice(0, 200));
+        } else {
+          console.error("[vrp] Launch failed:", res.status, body.slice(0, 500));
+          alert("Launch failed (" + res.status + ")");
+        }
+      })
+      .catch(err => {
+        console.error("[vrp] Network error posting /jobs:", err);
+        alert("Network error posting /jobs");
+      })
+      .finally(() => {
+        if (this.hasLaunchLabelTarget) this.launchLabelTarget.textContent = "Launch Mission";
+        if (this.hasLaunchSpinnerTarget) this.launchSpinnerTarget.classList.add("hidden");
+      });
+
+    } catch (e) {
+      console.error("[vrp] solve() threw:", e);
     }
-
-    const token = document.querySelector('meta[name="csrf-token"]')?.content
-    const payload = {
-      job: {
-        problem_type: "vrp",
-        solver: config.solverType || "demo",
-        seed: Math.floor(Math.random() * 10000),
-        params: config
-      }
-    }
-
-    this.showLaunchMoment()
-    this.appendLog(`Launching ${payload.job.solver} mission…`)
-
-    fetch("/jobs", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRF-Token": token,
-        "Accept": "text/vnd.turbo-stream.html"
-      },
-      credentials: "same-origin",
-      body: JSON.stringify(payload)
-    })
-    .then(r => {
-      if (!r.ok) {
-        throw new Error(`Server responded with ${r.status}`)
-      }
-      return r.text()
-    })
-    .then(html => {
-      if (html) {
-          Turbo.renderStreamMessage(html)
-      }
-      this.appendLog("Mission queued.", "success")
-    })
-    .catch(err => {
-      this.failMission(err)
-    })
   }
 
   beginMission() {
@@ -460,6 +492,15 @@ export default class extends Controller {
     }
 
     this.logTarget.scrollTop = this.logTarget.scrollHeight
+  }
+
+  copyLog() {
+    const logText = this.logTarget.innerText;
+    navigator.clipboard.writeText(logText).then(() => {
+      this.appendLog("Log copied to clipboard.", "info");
+    }, () => {
+      this.appendLog("Failed to copy log.", "error");
+    });
   }
 
   toggleForm(disabled) {

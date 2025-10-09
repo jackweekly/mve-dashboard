@@ -1,1 +1,12 @@
-<%= turbo_stream.prepend "dashboard-jobs", partial: "jobs/job_row", locals: { job: @job } %>
+<turbo-stream action="prepend" target="vrp-recent-jobs">
+  <template>
+    <%= render partial: "jobs/job_row", formats: [:html], locals: { job: @job } %>
+  </template>
+</turbo-stream>
+
+<%= turbo_stream.append "log" do %>
+  <div class="flex items-start gap-2 text-xs text-emerald-300">
+    <span class="text-slate-500"><%= Time.now.strftime("%H:%M:%S") %></span>
+    <span>Mission queued.</span>
+  </div>
+<% end %>

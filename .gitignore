@@ -32,3 +32,6 @@ __pycache__/
 
 # Test coverage reports
 coverage/
+config/master.key
+
+/config/master.key

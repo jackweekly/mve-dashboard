@@ -1,0 +1,15 @@
+[Unit]
+Description=Solid Queue worker (Active Job) for mve-dashboard
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+WorkingDirectory=/home/ubuntu/mve-dashboard
+Environment="RAILS_ENV=production" "RAILS_MASTER_KEY=YOUR_KEY"
+ExecStart=/usr/bin/env bash -lc 'bundle exec rails solid_queue:start'
+Restart=always
+User=ubuntu
+Group=ubuntu
+
+[Install]
+WantedBy=multi-user.target

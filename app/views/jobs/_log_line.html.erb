@@ -1,0 +1,4 @@
+<div class="flex items-start gap-2 text-xs <%= level == :error ? 'text-red-300' : level == :warn ? 'text-amber-300' : 'text-emerald-300' %>">
+  <span class="text-slate-500"><%= Time.current.strftime("%H:%M:%S") %></span>
+  <span><%= message %></span>
+</div>

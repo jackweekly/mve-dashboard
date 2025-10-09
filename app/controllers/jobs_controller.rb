@@ -19,17 +19,17 @@ class JobsController < ApplicationController
     @job.user = current_user
 
     if @job.save
-      RunJobWorker.perform_async(@job.id)
+      VrpJob.perform_later(@job.id)
       respond_to do |format|
         format.turbo_stream
         format.html { redirect_to job_path(@job), notice: "Job was successfully queued." }
         format.json { render json: { id: @job.id }, status: :created }
       end
     else
-      @params_json = params.dig(:job, :params_json)
       respond_to do |format|
         format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @job.errors, status: :unprocessable_entity }
+        format.turbo_stream { render turbo_stream: turbo_stream.replace("form_errors", partial: "shared/errors", locals: { object: @job }), status: :unprocessable_entity }
       end
     end
   end
@@ -60,13 +60,16 @@ class JobsController < ApplicationController
   end
 
   def job_params
-    params.require(:job).permit(:problem_type, :solver, :seed).tap do |whitelisted|
-      whitelisted[:params] = params.require(:job).fetch(:params, ActionController::Parameters.new).permit!
-    end
+    params.require(:job).permit(
+      :problem_type, :solver, :seed,
+      params: {} # <-- allow nested JSON/hash
+    )
   end
 
   def current_user
-    User.first # Temporary: Implement proper user authentication and retrieval here.
+    User.first_or_create!(email: "dev@example.com") do |user|
+      user.password = "password"
+    end
   end
 
   def format_params(hash)

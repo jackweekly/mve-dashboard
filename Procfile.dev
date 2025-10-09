@@ -1,5 +1,4 @@
 web: bin/rails server -p 3001
-worker: bundle exec sidekiq -C config/sidekiq.yml
-css: bin/rails tailwindcss:watch
+worker: bundle exec rails solid_queue:start
 redis: ./bin/dev-redis
-python: sh -c "python_service/.venv/bin/python python_service/vrp_solver.py -p 8001"
+# python: sh -c "python_service/.venv/bin/python python_service/vrp_solver.py -p 8001"

@@ -24,6 +24,7 @@ default: &default
 
 development:
   <<: *default
+  database: mve_dashboard_development
   username: bupper
   password: "38Jw*gL=b>1:"
 

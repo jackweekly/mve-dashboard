@@ -9,7 +9,16 @@ default: &default
       polling_interval: 0.1
 
 development:
-  <<: *default
+  dispatch: true
+  polling_interval: 1
+  batch_size: 500
+  concurrency_maintenance_interval: 5
+  processes_heartbeat_interval: 15
+  supervisor_options:
+    batch_size: 100
+    polling_interval: 1
+    concurrency_maintenance_interval: 5
+    processes_heartbeat_interval: 15
 
 test:
   <<: *default
